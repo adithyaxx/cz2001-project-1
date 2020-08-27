@@ -29,12 +29,15 @@ void brute_force_search(search_params &sp, vector<int> &indices) {
 
     for (int i = sp.start, j = 0; i < sp.end; i++) {
         index = i;
+
+        if (input_vector.at(i) != sp.search_seq[j]) {
+            j = 0;
+            is_match = false;
+        }
+
         if (input_vector.at(i) == sp.search_seq[j]) {
             is_match = true;
             j++;
-        } else {
-            j = 0;
-            is_match = false;
         }
 
         if (is_match && j == sp.search_seq_size) {
@@ -63,8 +66,15 @@ void brute_force_search_multithreaded(search_params &sp, vector<int> &indices) {
         pthread_t id;
         auto *sp2 = new search_params();
 
+
         sp2->start = i * steps;
-        sp2->end = (i + 1) * steps;
+
+        if (i == (NUM_THREADS - 1))
+            sp2->end = input_vector.size();
+        else {
+            sp2->end = ((i + 1) * steps) + (sp.search_seq_size - 1);
+        }
+
         sp2->search_seq = sp.search_seq;
         sp2->search_seq_size = sp.search_seq_size;
 
@@ -82,12 +92,12 @@ void brute_force_search_multithreaded(search_params &sp, vector<int> &indices) {
 }
 
 int main() {
-    string search_seq = "TAGTTG";
+    string search_seq = "ACGTA";
     vector<int> indices;
     search_params sp;
 
     auto start = high_resolution_clock::now();
-    get_data("../genome.fna", input_vector);
+    get_data("../sample.fna", input_vector);
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
     cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl << endl;
