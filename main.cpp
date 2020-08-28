@@ -3,8 +3,10 @@
 #include <vector>
 #include <fstream>
 #include "main.h"
+#include <chrono>
 
 #define NUM_THREADS 8
+#define NO_OF_UNIQUE_DNA 4
 
 using namespace std;
 using namespace std::chrono;
@@ -91,13 +93,69 @@ void brute_force_search_multithreaded(search_params &sp, vector<int> &indices) {
     }
 }
 
+// for Boyer-Moore Bad Char Heuristic Algorithm
+int hashFunction(char dna) {
+    return ((int) dna/2)%4;
+}
+
+void insertItem(char dna, int index, int hashTable[NO_OF_UNIQUE_DNA]) {
+    int key = hashFunction(dna);
+    hashTable[key] = index;
+}
+ 
+int searchItem(char dna, int hashTable[NO_OF_UNIQUE_DNA]) {
+    int key = hashFunction(dna);
+    return hashTable[key];
+}
+
+void badCharHeuristic(string pattern, int hashTable[NO_OF_UNIQUE_DNA]) {
+    int i{};
+    for (char& c : pattern) {
+        insertItem(c, i, hashTable);
+        i++;
+    }
+}
+
+vector<int> badCharHeuSearch(vector<char> sequence, string pattern) {
+    vector<int> occurenceIndex;
+
+    // initialize the hash table with -1
+    int hashTable [NO_OF_UNIQUE_DNA] = {-1, -1, -1, -1};
+    int sequenceSize = sequence.size(), patternSize = pattern.size();
+    
+    badCharHeuristic(pattern, hashTable);
+
+    int offset{};
+
+    while (offset <= (sequenceSize - patternSize)) {
+        int patternIndex = patternSize - 1;
+
+        while (patternIndex >= 0 && pattern[patternIndex] == sequence.at(patternIndex + offset)) {
+            patternIndex--;
+        }
+
+        // If the pattern is present at current offset, patternIndex will be -1 after the execution of the code above
+        if (patternIndex < 0) {
+            occurenceIndex.push_back(offset);   // pattern found. saving index at vector
+
+            offset += (offset + patternSize < sequenceSize) ? patternSize - searchItem(sequence[offset + patternSize], hashTable) : 1;
+        }
+        else {
+            offset += max(1, patternIndex - searchItem(sequence[offset + patternIndex], hashTable));
+        }
+    }
+
+    return occurenceIndex;
+}
+
+
 int main() {
-    string search_seq = "ACGTA";
+    string search_seq = "TACGTCTG";
     vector<int> indices;
     search_params sp;
 
     auto start = high_resolution_clock::now();
-    get_data("../sample.fna", input_vector);
+    get_data("salmonella.fna", input_vector);
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
     cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl << endl;
@@ -122,6 +180,13 @@ int main() {
     end = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
     cout << "Muli-Threaded Brute Force: " << duration.count() << "ms" << endl;
+    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+    start = high_resolution_clock::now();
+    indices = badCharHeuSearch(input_vector, search_seq);
+    end = high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(end - start);
+    cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
     cout << "Found " << indices.size() << " matches!" << endl;
 
     return 0;
