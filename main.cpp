@@ -26,26 +26,13 @@ void get_data(const string &filepath, vector<char> &data) {
 }
 
 void brute_force_search(search_params &sp, vector<int> &indices) {
-    bool is_match;
-    int index;
+    for (int i = sp.start, j; i < sp.end - sp.search_seq_size + 1; i++) {
+        for (j = 0; j < sp.search_seq_size; j++)
+            if (input_vector.at(i + j) != sp.search_seq[j])
+                break;
 
-    for (int i = sp.start, j = 0; i < sp.end; i++) {
-        index = i;
-
-        if (input_vector.at(i) != sp.search_seq[j]) {
-            j = 0;
-            is_match = false;
-        }
-
-        if (input_vector.at(i) == sp.search_seq[j]) {
-            is_match = true;
-            j++;
-        }
-
-        if (is_match && j == sp.search_seq_size) {
-            j = 0;
-            indices.push_back(index);
-        }
+        if (j == sp.search_seq_size)
+            indices.push_back(i);
     }
 }
 
