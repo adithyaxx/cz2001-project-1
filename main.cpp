@@ -3,9 +3,9 @@
 #include <vector>
 #include <chrono>
 
-#include "include/brute_force.h"
-#include "include/boyer_moore.h"
-#include "include/kmp.h"
+#include "brute_force.h"
+#include "boyer_moore.h"
+#include "kmp.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -18,7 +18,7 @@ int main() {
     search_params sp;
 
     auto start = high_resolution_clock::now();
-    get_data("genome.fna", input_vector);
+    get_data("../genome.fna", input_vector);
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
     cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl << endl;

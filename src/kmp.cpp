@@ -2,7 +2,7 @@
 // Created by Adithya on 31/8/20.
 //
 
-#include "../include/kmp.h"
+#include "kmp.h"
 #include <pthread.h>
 
 void create_kmp_table(const char *search_seq, int *table) {

@@ -15,10 +15,10 @@ using namespace std;
 extern vector<char> input_vector;
 
 typedef struct search_params_t {
-    int start=0;
-    int end=0;
-    const char *search_seq;
-    int search_seq_size=0;
+    int start = 0;
+    int end = 0;
+    const char *search_seq = nullptr;
+    int search_seq_size = 0;
 } search_params;
 
 void get_data(const string &filepath, vector<char> &data);

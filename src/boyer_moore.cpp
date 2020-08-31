@@ -1,7 +1,7 @@
 //
 // Created by Adithya on 31/8/20.
 //
-#include "../include/boyer_moore.h"
+#include "boyer_moore.h"
 
 int hashFunction(char dna) {
     return ((int) dna / 2) % 4;
