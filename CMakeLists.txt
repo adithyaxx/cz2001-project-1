@@ -9,7 +9,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 include_directories(
@@ -22,4 +22,4 @@ file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
         )
 
-add_executable(cz2001_project_1 main.cpp ${all_SRCS})
+add_executable(cz2001_project_1 main.cpp ${all_SRCS} src/rabin_karp.cpp include/rabin_karp.h)

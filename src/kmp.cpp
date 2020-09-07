@@ -4,6 +4,7 @@
 
 #include "kmp.h"
 #include <pthread.h>
+#include <iostream>
 
 void create_kmp_table(const char *search_seq, int *table) {
     int len = 0;
@@ -28,26 +29,17 @@ void create_kmp_table(const char *search_seq, int *table) {
 }
 
 void kmp_search(search_params &sp, vector<int> &indices) {
-    int i = sp.start;
-    int j = 0;
     int table[sp.search_seq_size];
 
     create_kmp_table(sp.search_seq, table);
 
-    while (i < sp.end) {
+    for (int i = sp.start, j = 0; i < sp.end; i++) {
         if (sp.search_seq[j] == input_vector.at(i)) {
-            j++;
-            i++;
-        }
-
-        if (j == sp.search_seq_size) {
-            indices.push_back(i - j);
+            if (++j == sp.search_seq_size)
+                indices.push_back(i - j);
+        } else if (j > 0) {
             j = table[j - 1];
-        } else if (i < sp.end && sp.search_seq[j] != input_vector.at(i)) {
-            if (j != 0)
-                j = table[j - 1];
-            else
-                i++;
+            i--;
         }
     }
 }
