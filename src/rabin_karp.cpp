@@ -5,6 +5,7 @@
 #include <utils.h>
 #include "rabin_karp.h"
 #include "pthread.h"
+#include <string.h>
 
 #define d 4
 #define q 101

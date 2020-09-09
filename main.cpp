@@ -19,7 +19,7 @@ int main() {
     search_params sp;
 
     auto start = high_resolution_clock::now();
-    get_data("../genome2.fna", input_vector);
+    get_data("../fruitfly.fna", input_vector);
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
     cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl << endl;
@@ -38,8 +38,9 @@ int main() {
     cout << "Found " << indices.size() << " matches!" << endl << endl;
 
     // Boyer Moore (Bad Character Heuristic)
+    indices.clear();
     start = high_resolution_clock::now();
-    indices = badCharHeuSearch(input_vector, search_seq);
+    badCharHeuSearch(sp, indices);
     end = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(end - start);
     cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
@@ -73,7 +74,13 @@ int main() {
     cout << "Found " << indices.size() << " matches!" << endl << endl;
 
     // Multi-Threaded Boyer Moore
-    // TODO: @zerin
+    indices.clear();
+    start = high_resolution_clock::now();
+    badCharHeuSearch_multithreaded(sp, indices);
+    end = high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(end - start);
+    cout << "Multi-Threaded Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
+    cout << "Found " << indices.size() << " matches!" << endl << endl;
 
     // Multi-Threaded KMP
     indices.clear();
@@ -92,6 +99,6 @@ int main() {
     duration = duration_cast<milliseconds>(end - start);
     cout << "Multi-Threaded Rabin Karp: " << duration.count() << "ms" << endl;
     cout << "Found " << indices.size() << " matches!" << endl << endl;
-
+    
     return 0;
 }

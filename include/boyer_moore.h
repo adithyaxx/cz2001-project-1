@@ -7,11 +7,13 @@
 
 #include <vector>
 #include <string>
+#include "utils.h"
 
-#define NO_OF_UNIQUE_DNA 4
+#define TABLE_SIZE 5
 
 using namespace std;
 
-vector<int> badCharHeuSearch(vector<char> sequence, string pattern);
+void badCharHeuSearch(search_params &sp, vector<int> &indices);
 
+void badCharHeuSearch_multithreaded(search_params &sp, vector<int> &indices);
 #endif //CZ2001_PROJECT_1_BOYER_MOORE_H

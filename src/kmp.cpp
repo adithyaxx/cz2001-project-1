@@ -5,6 +5,7 @@
 #include "kmp.h"
 #include <pthread.h>
 #include <iostream>
+#include <string.h>
 
 void create_kmp_table(const char *search_seq, int *table) {
     int len = 0;
