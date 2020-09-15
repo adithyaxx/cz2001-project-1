@@ -2,6 +2,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,clion
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,clion
 
+*.fna
 **.DS_STORE
 
 ### C++ ###

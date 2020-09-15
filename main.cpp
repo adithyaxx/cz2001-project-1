@@ -14,91 +14,192 @@ using namespace std::chrono;
 vector<char> input_vector;
 
 int main() {
-    string search_seq = "ACTTTACTAAA";
+
+    //Main UI
+    //Initialization
+    int option, fileopen;
+    bool exit = true;
+    bool gotsearchsequence = false;
+    bool gotfilepath = false;
+    string search_seq;
     vector<int> indices;
     search_params sp;
-
+    string filename;
     auto start = high_resolution_clock::now();
-    get_data("../fruitfly.fna", input_vector);
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
-    cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl << endl;
+    while (exit) {
+        cout << "----------------------------------------" << endl;
+        cout << "1. Specify absolute filepath" << endl;
+        cout << "2. Enter search sequence" << endl;
+        cout << "3. Run brute force algorithm" << endl;
+        cout << "4. Run Boyer Moore algorithm" << endl;
+        cout << "5. Run Knuth Morris Pratt algorithm" << endl;
+        cout << "6. Run Rabin Karp algorithm" << endl;
+        cout << "7. Exit program" << endl;
+        cout << "----------------------------------------" << endl;
+        cout << "Enter option: ";
 
-    sp.start = 0;
-    sp.end = input_vector.size();
-    sp.search_seq = (char *) search_seq.c_str();
-    sp.search_seq_size = search_seq.size();
+        cin >> option;
+        while (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Wrong input! Please only enter numbers from 1 to 7" << endl;
+            cout << "Enter option: ";
+            cin >> option;
+        }
 
-    //Single Threaded Brute Force
-    start = high_resolution_clock::now();
-    brute_force_search(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Single Threaded Brute Force: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+        switch (option) {
+            case 1 : {
+                cout << "Please enter the filepath: ";
+                cin >> filename;
+                cout << "Loading file, please wait..." << endl;
+                start = high_resolution_clock::now();
 
-    // Boyer Moore (Bad Character Heuristic)
-    indices.clear();
-    start = high_resolution_clock::now();
-    badCharHeuSearch(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                while (!input_vector.empty())
+                    input_vector.pop_back();
 
-    // KMP
-    indices.clear();
-    start = high_resolution_clock::now();
-    kmp_search(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Knuth Morris Pratt: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                fileopen = get_data(filename, input_vector);
+                if (fileopen == 1) {
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Fetched " << input_vector.size() << " characters in " << duration.count() << "ms" << endl
+                         << endl;
+                    gotfilepath = true;
+                } else {
+                    cout << "Unable to open file" << endl;
+                    gotfilepath = false;
+                }
+                break;
 
-    // RK
-    indices.clear();
-    start = high_resolution_clock::now();
-    rk_search(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Rabin Karp: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+            }
 
-    // Multi-Threaded Brute Force
-    indices.clear();
-    start = high_resolution_clock::now();
-    brute_force_search_multithreaded(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Muli-Threaded Brute Force: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+            case 2 :
+                cout << "Please enter a search sequence: ";
+                cin >> search_seq;
 
-    // Multi-Threaded Boyer Moore
-    indices.clear();
-    start = high_resolution_clock::now();
-    badCharHeuSearch_multithreaded(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Multi-Threaded Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                if (search_seq.length() > 0) {
+                    sp.start = 0;
+                    sp.end = input_vector.size();
+                    sp.search_seq = (char *) search_seq.c_str();
+                    sp.search_seq_size = search_seq.size();
+                    gotsearchsequence = true;
+                } else {
+                    cout << "Invalid search sequence entered!" << endl;
+                    gotsearchsequence = false;
+                }
+                break;
 
-    // Multi-Threaded KMP
-    indices.clear();
-    start = high_resolution_clock::now();
-    kmp_search_multithreaded(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Multi-Threaded Knuth Morris Pratt: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
+            case 3 :
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    //Single Threaded Brute Force
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    brute_force_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Single Threaded Brute Force: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
 
-    // Multi-Threaded Rabin Karp
-    indices.clear();
-    start = high_resolution_clock::now();
-    rk_search_multithreaded(sp, indices);
-    end = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(end - start);
-    cout << "Multi-Threaded Rabin Karp: " << duration.count() << "ms" << endl;
-    cout << "Found " << indices.size() << " matches!" << endl << endl;
-    
+                    // Multi-Threaded Brute Force
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    brute_force_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Muli-Threaded Brute Force: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    break;
+                }
+
+            case 4:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    // Boyer Moore (Bad Character Heuristic)
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    badCharHeuSearch(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    // Multi-Threaded Boyer Moore
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    badCharHeuSearch_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms"
+                         << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    break;
+                }
+
+            case 5:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    // KMP
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    kmp_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Knuth Morris Pratt: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    // Multi-Threaded KMP
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    kmp_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Knuth Morris Pratt: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    break;
+                }
+
+            case 6:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    // RK
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    rk_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Rabin Karp: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    // Multi-Threaded Rabin Karp
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    rk_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Rabin Karp: " << duration.count() << "ms" << endl;
+                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+
+                    break;
+                }
+
+            case 7:
+                exit = false;
+                break;
+
+            default:
+                if (!gotfilepath)
+                    cout << "Please specify a filepath first!" << endl;
+                else if (!gotsearchsequence)
+                    cout << " Please specify a search sequence first!" << endl;
+                else
+                    cout << "Invalid option! Please try again!" << endl;
+        }
+    }
+
     return 0;
 }

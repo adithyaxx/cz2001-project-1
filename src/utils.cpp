@@ -6,7 +6,7 @@
 #include <iostream>
 #include "../include/utils.h"
 
-void get_data(const string &filepath, vector<char> &data) {
+int get_data(const string &filepath, vector<char> &data) {
     string line;
     ifstream myfile(filepath);
     if (myfile.is_open()) {
@@ -15,6 +15,8 @@ void get_data(const string &filepath, vector<char> &data) {
             data.insert(data.end(), c, c + line.size());
         }
         myfile.close();
+        return 1;
     } else
-        cout << "Unable to open file";
+        return 0;
+
 }

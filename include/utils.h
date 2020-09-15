@@ -21,6 +21,6 @@ typedef struct search_params_t {
     int search_seq_size = 0;
 } search_params;
 
-void get_data(const string &filepath, vector<char> &data);
+int get_data(const string &filepath, vector<char> &data);
 
 #endif //CZ2001_PROJECT_1_UTILS_H
