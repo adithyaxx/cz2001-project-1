@@ -28,6 +28,7 @@ int main() {
     auto start = high_resolution_clock::now();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
+
     while (exit) {
         cout << "----------------------------------------" << endl;
         cout << "1. Specify absolute filepath" << endl;
