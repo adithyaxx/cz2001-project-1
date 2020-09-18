@@ -22,4 +22,4 @@ file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
         )
 
-add_executable(cz2001_project_1 main.cpp ${all_SRCS} src/rabin_karp.cpp include/rabin_karp.h)
+add_executable(cz2001_project_1 main.cpp ${all_SRCS})

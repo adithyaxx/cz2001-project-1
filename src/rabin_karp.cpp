@@ -2,48 +2,50 @@
 // Created by Adithya on 7/9/20.
 //
 
-#include <utils.h>
+#include <iostream>
 #include "rabin_karp.h"
 #include "pthread.h"
-#include <string.h>
+#include <unordered_map>
 
-#define d 4
-#define q 101
+#define CHAR_SET_LEN 4
+#define PRIME_NUM 13
 
 void rk_search(search_params &sp, vector<int> &indices) {
-    int M = strlen(sp.search_seq);
     int i, j;
     int search_seq_hash = 0; // hash value for sp.search_seq
     int input_vector_hash = 0; // hash value for input_vector
     int h = 1;
 
-    for (i = sp.start; i < sp.start + (M - 1); i++)
-        h = (h * d) % q;
-
-    for (i = 0; i < M; i++) {
-        search_seq_hash = (d * search_seq_hash + sp.search_seq[i]) % q;
+    for (i = sp.start; i < sp.start + (sp.search_seq_size - 1); i++) {
+        h = (h * CHAR_SET_LEN) % PRIME_NUM;
     }
 
-    for (i = sp.start; i < sp.start+M; i++) {
-        input_vector_hash = (d * input_vector_hash + input_vector[i]) % q;
+    for (i = 0; i < sp.search_seq_size; i++) {
+        search_seq_hash = (search_seq_hash * CHAR_SET_LEN + sp.search_seq[i]) % PRIME_NUM;
     }
 
-    for (i = sp.start; i <= sp.end - M; i++) {
+    for (i = sp.start; i < sp.start + sp.search_seq_size; i++) {
+        input_vector_hash = (input_vector_hash * CHAR_SET_LEN + input_vector[i]) % PRIME_NUM;
+    }
+
+    for (i = sp.start; i <= sp.end - sp.search_seq_size; i++) {
         if (search_seq_hash == input_vector_hash) {
-            for (j = 0; j < M; j++) {
+            for (j = 0; j < sp.search_seq_size; j++) {
                 if (input_vector[i + j] != sp.search_seq[j])
                     break;
             }
 
-            if (j == M)
+            if (j == sp.search_seq_size)
                 indices.push_back(i);
         }
 
-        if (i < sp.end - M) {
-            input_vector_hash = (d * (input_vector_hash - input_vector[i] * h) + input_vector[i + M]) % q;
+        if (i < sp.end - sp.search_seq_size) {
+            input_vector_hash =
+                    ((input_vector_hash - input_vector[i] * h) * CHAR_SET_LEN + input_vector[i + sp.search_seq_size]) %
+                    PRIME_NUM;
 
             if (input_vector_hash < 0)
-                input_vector_hash = (input_vector_hash + q);
+                input_vector_hash += PRIME_NUM;
         }
     }
 }

@@ -7,11 +7,23 @@
 #include "boyer_moore.h"
 #include "kmp.h"
 #include "rabin_karp.h"
+#include "dual_index_search.h"
 
 using namespace std;
 using namespace std::chrono;
 
 vector<char> input_vector;
+
+void print(vector<int> &indices) {
+    cout << "Found matches at: ";
+    for (int i = 0; i < indices.size(); i++) {
+        cout << indices[i];
+
+        if (i != indices.size() - 1)
+            cout << ",";
+    }
+    cout << endl << endl;
+}
 
 int main() {
 
@@ -33,11 +45,13 @@ int main() {
         cout << "----------------------------------------" << endl;
         cout << "1. Specify absolute filepath" << endl;
         cout << "2. Enter search sequence" << endl;
-        cout << "3. Run brute force algorithm" << endl;
-        cout << "4. Run Boyer Moore algorithm" << endl;
-        cout << "5. Run Knuth Morris Pratt algorithm" << endl;
-        cout << "6. Run Rabin Karp algorithm" << endl;
-        cout << "7. Exit program" << endl;
+        cout << "3. Run all algorithms" << endl;
+        cout << "4. Run brute force algorithm" << endl;
+        cout << "5. Run Boyer Moore algorithm" << endl;
+        cout << "6. Run Knuth Morris Pratt algorithm" << endl;
+        cout << "7. Run Rabin Karp algorithm" << endl;
+        cout << "8. Run dual index algorithm" << endl;
+        cout << "9. Exit program" << endl;
         cout << "----------------------------------------" << endl;
         cout << "Enter option: ";
 
@@ -45,13 +59,13 @@ int main() {
         while (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
-            cout << "Wrong input! Please only enter numbers from 1 to 7" << endl;
+            cout << "Wrong input! Please only enter numbers from 1 to 8" << endl;
             cout << "Enter option: ";
             cin >> option;
         }
 
         switch (option) {
-            case 1 : {
+            case 1:
                 cout << "Please enter the filepath: ";
                 cin >> filename;
                 cout << "Loading file, please wait..." << endl;
@@ -73,9 +87,8 @@ int main() {
                 }
                 break;
 
-            }
 
-            case 2 :
+            case 2:
                 cout << "Please enter a search sequence: ";
                 cin >> search_seq;
 
@@ -91,9 +104,10 @@ int main() {
                 }
                 break;
 
-            case 3 :
+            case 3:
                 if (gotfilepath && gotsearchsequence) {
                     cout << endl;
+
                     //Single Threaded Brute Force
                     indices.clear();
                     start = high_resolution_clock::now();
@@ -101,7 +115,7 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Single Threaded Brute Force: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     // Multi-Threaded Brute Force
                     indices.clear();
@@ -110,14 +124,8 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Muli-Threaded Brute Force: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
-                    break;
-                }
-
-            case 4:
-                if (gotfilepath && gotsearchsequence) {
-                    cout << endl;
                     // Boyer Moore (Bad Character Heuristic)
                     indices.clear();
                     start = high_resolution_clock::now();
@@ -125,7 +133,7 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     // Multi-Threaded Boyer Moore
                     indices.clear();
@@ -135,12 +143,114 @@ int main() {
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Multi-Threaded Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms"
                          << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
+
+                    // KMP
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    kmp_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Knuth Morris Pratt: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded KMP
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    kmp_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Knuth Morris Pratt: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    rk_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Rabin Karp: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded Rabin Karp
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    rk_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Rabin Karp: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Dual Index
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    dual_index_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Dual Index: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded Dual Index
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    dual_index_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Dual Index: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    break;
+                }
+
+            case 4:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    //Single Threaded Brute Force
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    brute_force_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Single Threaded Brute Force: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded Brute Force
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    brute_force_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Muli-Threaded Brute Force: " << duration.count() << "ms" << endl;
+                    print(indices);
 
                     break;
                 }
 
             case 5:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    // Boyer Moore (Bad Character Heuristic)
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    badCharHeuSearch(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded Boyer Moore
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    badCharHeuSearch_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Boyer Moore (Bad Character Heuristic): " << duration.count() << "ms"
+                         << endl;
+                    print(indices);
+
+                    break;
+                }
+
+            case 6:
                 if (gotfilepath && gotsearchsequence) {
                     cout << endl;
                     // KMP
@@ -150,7 +260,7 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Knuth Morris Pratt: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     // Multi-Threaded KMP
                     indices.clear();
@@ -159,12 +269,12 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Multi-Threaded Knuth Morris Pratt: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     break;
                 }
 
-            case 6:
+            case 7:
                 if (gotfilepath && gotsearchsequence) {
                     cout << endl;
                     // RK
@@ -174,7 +284,7 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Rabin Karp: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     // Multi-Threaded Rabin Karp
                     indices.clear();
@@ -183,12 +293,36 @@ int main() {
                     end = high_resolution_clock::now();
                     duration = duration_cast<milliseconds>(end - start);
                     cout << "Multi-Threaded Rabin Karp: " << duration.count() << "ms" << endl;
-                    cout << "Found " << indices.size() << " matches!" << endl << endl;
+                    print(indices);
 
                     break;
                 }
 
-            case 7:
+            case 8:
+                if (gotfilepath && gotsearchsequence) {
+                    cout << endl;
+                    // Dual Index
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    dual_index_search(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Dual Index: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    // Multi-Threaded Dual Index
+                    indices.clear();
+                    start = high_resolution_clock::now();
+                    dual_index_search_multithreaded(sp, indices);
+                    end = high_resolution_clock::now();
+                    duration = duration_cast<milliseconds>(end - start);
+                    cout << "Multi-Threaded Dual Index: " << duration.count() << "ms" << endl;
+                    print(indices);
+
+                    break;
+                }
+
+            case 9:
                 exit = false;
                 break;
 
