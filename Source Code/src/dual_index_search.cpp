@@ -25,7 +25,7 @@ void dual_index_search(search_params &sp, vector<int> &indices) {
                 break;
         }
 
-        if (j == sp.search_seq_size)
+        if (j == sp.search_seq_size - 1)
             indices.push_back(i);
     }
 }
