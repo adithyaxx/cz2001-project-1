@@ -69,6 +69,10 @@ int main() {
             cin >> option;
         }
 
+        // Reset
+        sp.start = 0;
+        sp.end = input_vector.size();
+
         switch (option) {
             case 1:
                 cout << "Please enter the filepath: ";
@@ -108,7 +112,6 @@ int main() {
                     gotsearchsequence = false;
                 }
                 break;
-
             case 3:
                 if (gotfilepath && gotsearchsequence) {
                     cout << endl;
